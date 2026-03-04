@@ -7,11 +7,38 @@
 </head>
 <body>
     {% if program %}
-        {set program_name = program.name} 
+        {% set program_name = program.name %} 
+        {% set program_desc = program.description %}
+        {% set is_active = program.currently_active %}
+        {% set creation_time = program.created_at %}
     {% else %}
-
+        {% set program_name = "Enter Name for Program" %}
+        {% set program_desc = "(Optional description)" %}
+        {% set is_active = False %}
+        {% set creation_time = "" %}
     {% endif %}
 
-    <h1> {{ program_name }} </h1>
+    <p>{{ error if error }}</p>
+
+    <form method="post">
+        <div>
+            <h1>
+                <input type="text" name="program_name" placeholder="{{ program_name }}" required><br>  
+            </h1>
+
+            <label for="status">Active:</label>
+            <input type="radio" name="status" {% if is_active %}checked{% endif %}><br>
+
+            <p>
+                <textarea name="program_desc" placeholder="{{ program_desc }}"></textarea><br>
+            </p>
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <button onclick="window.location.href='/program_dashboard'">Back to Program Dashboard</button>
+
+    
 </body>
 </html>

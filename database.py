@@ -1,8 +1,9 @@
-from ast import List
-import sqlite3
-
-from werkzeug.security import check_password_hash, generate_password_hash
 from exceptions import UserExistsException, UserDoesntExistException
+
+
+import sqlite3
+from werkzeug.security import check_password_hash, generate_password_hash
+from datetime import datetime
 
 #-----------------------------------------------------------------------------------
 
@@ -82,7 +83,7 @@ class Database:
                 user_id INTEGER NOT NULL,
                 name TEXT NOT NULL,
                 description TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                created_at TEXT,
                 currently_active BOOLEAN DEFAULT 1,
                 FOREIGN KEY (user_id) REFERENCES users(id)
             )
@@ -246,5 +247,34 @@ class Database:
             return Workout_Program(result[0], result[1], result[2], result[3], result[4], result[5])
         else:
             return None
+
+    def create_workout_program(self, name : str, user_id : int, description : str = None, created_at : str = None, currently_active : bool = True) -> Workout_Program:
+        """
+        Creates a new workout program in the database with the provided name and user ID.
+
+        Args:
+            name (str): The name of the new workout program to create.
+            user_id (int): The unique identifier of the user who owns the new workout program.
+            description (str, optional): A description of the new workout program. Defaults to None.
+            created_at (str, optional): The timestamp of when the new workout program was created. Defaults to None, which will use the current timestamp.
+            currently_active (bool, optional): Whether the new workout program is currently active. Defaults to True.
+
+        Returns:
+            Workout_Program: A Workout_Program object representing the newly created workout program if the operation is successful.
+        """
+
+        if not created_at:
+            created_at = datetime.now().isoformat()
+
+        self._cur.execute(
+            "INSERT INTO workout_programs (name, user_id, description, created_at, currently_active) VALUES (?, ?, ?, ?, ?)", 
+            (name, user_id, description, created_at, currently_active)
+        )
+        self._conn.commit()
+
+        new_program_id = self._cur.lastrowid
+        new_workout_program = self.retrieve_workout_program_by_id(new_program_id)
+
+        return new_workout_program
 
 #------------------------------------------------------------------------------------

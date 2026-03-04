@@ -13,7 +13,7 @@ import os
 
 # Main app
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = "admin123" # Currently hardcoded, but need change
 
 @app.route("/")
 def home():
@@ -84,6 +84,8 @@ def register():
 
 
 
+
+
 @app.route("/program_dashboard", methods=["GET"])
 def program_dashboard():
     db = Database()
@@ -95,11 +97,29 @@ def program_dashboard():
 
 
 
+
+
+
+
+
 @app.route("/program", methods=["POST", "GET"])
 def create_program():
 
     if request.method == "POST":
-        pass
+        db = Database()
+        
+        try:
+            print(session.get("user_id"))
+            new_workout_program = db.create_workout_program(
+                name=request.form["program_name"],
+                user_id=session.get("user_id"),
+                description=request.form["program_desc"],
+                currently_active=request.form["status"])
+        except Exception as e:
+            error = f"An unexpected error occurred: {str(e)}"
+            return render_template("program.html", error=error)
+        
+        return redirect(f"/program/{new_workout_program.id}")
 
     return render_template("program.html")
 
@@ -124,6 +144,17 @@ def program(program_id):
 
 
     return render_template("program.html", program=program)
+
+
+
+
+#APIS ----------------------------------------------------------------------------------------------------------------
+
+
+@app.route("/api/logout", methods=["GET"])
+def logout():
+    session.clear()
+    return redirect("/login")
 
 #------------------------------------------------------------------
 
