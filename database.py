@@ -1,3 +1,4 @@
+from ast import List
 import sqlite3
 
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -15,13 +16,38 @@ class User:
         username (str): The username of the user.
     """
 
-    def __init__(self, id : int, username : str) -> None:
+    def __init__(self, id : int, username : str):
         self.id = id
         self.username = username
         print(f"User created: {self}")
 
     def __repr__(self):
         return f"<User: {self.username} id: {self.id}>"
+    
+
+#------------------------------------------------------------------------------------
+
+#Workout_program class to represent a workout program in the system    
+class Workout_Program:
+    """
+    Represents a Workout Program owned by a user
+
+    Attributes:
+        id (int): The unique identifier for the workout program.
+        user_id (int): The unique identifier of the user who owns the workout program.
+        name (str): The name of the workout program.
+    """ 
+
+    def __init__(self, id : int, user_id : int, name : str, description : str = None, created_at : str = None, currently_active : bool = True):
+        self.id = id
+        self.user_id = user_id
+        self.name = name
+        self.description = description
+        self.created_at = created_at
+        self.currently_active = currently_active
+
+    def __repr__(self):
+        return f"<Workot Program: id: {self.id} name: {self.name} owned by: {self.user_id}"
 
 #------------------------------------------------------------------------------------
 
@@ -37,7 +63,7 @@ class Database:
         _table_schema (dict): Internal dictionary containing the SQL schema for each table in the database.
     """
 
-    def __init__(self, db_name='workout.db') -> None:
+    def __init__(self, db_name='workout.db'):
         self._conn = sqlite3.connect(db_name)
         self._cur = self._conn.cursor()
 
@@ -183,6 +209,42 @@ class Database:
         new_user = self.get_user(username, password)
 
         return new_user
+    
+    def retrieve_all_workout_programs(self) -> list[Workout_Program]:
+        """
+        Will retrieve all workout programs in the database and return them as a list of Workout_Program objects
+        
+        Returns:
+            List[Workout_Program]: A list of all Workout_Program objects in the database.
+        """
 
+        self._cur.execute("SELECT id, user_id, name, description, created_at, currently_active FROM workout_programs")
+        results = self._cur.fetchall()
+
+        workout_program_list = []
+        for result in results:
+            new_workout_program = Workout_Program(result[0], result[1], result[2], result[3], result[4], result[5])
+            workout_program_list.append(new_workout_program)
+
+        return workout_program_list
+    
+    def retrieve_workout_program_by_id(self, program_id : int) -> Workout_Program:
+        """
+        Retrieves a workout program from the database based on the provided program ID.
+
+        Args:
+            program_id (int): The unique identifier of the workout program to retrieve.
+
+        Returns:
+            Workout_Program: A Workout_Program object representing the retrieved workout program if it exists, or None if it does not exist.
+        """
+
+        self._cur.execute("SELECT id, user_id, name, description, created_at, currently_active FROM workout_programs WHERE id = ?", (program_id,))
+        result = self._cur.fetchone()
+
+        if result:
+            return Workout_Program(result[0], result[1], result[2], result[3], result[4], result[5])
+        else:
+            return None
 
 #------------------------------------------------------------------------------------

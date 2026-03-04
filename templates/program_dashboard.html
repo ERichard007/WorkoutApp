@@ -7,5 +7,21 @@
 </head>
 <body>
     <h1>Program Dashboard</h1>
+
+    <div>
+        <button onclick="location.href='/program'">Create New Program</button>
+    </div>
+
+    <ul>
+        {% for program in workout_programs %}
+            <li>{{ program.name }} (ID: {{ program.id }}) ({{ program.created_at }} ({{ program.currently_active }}))</li>
+            {% if program.user_id == user_id %}
+                <span>(Owned by you)</span>
+                <button onclick="location.href='/program/{{ program.id }}'">Edit</button>
+            {% else %}
+                <button onclick="location.href='/program/{{ program.id }}'">View</button>
+            {% endif %}
+        {% endfor %}
+    </ul>
 </body>
 </html>

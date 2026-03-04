@@ -28,6 +28,10 @@ def home():
     return redirect("/login")
 
 
+
+
+
+
 @app.route("/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
@@ -49,6 +53,9 @@ def login():
             return render_template("login.html", error=error)
 
     return render_template("login.html")
+
+
+
 
 
 @app.route("/register", methods=["POST", "GET"])
@@ -74,9 +81,49 @@ def register():
     return render_template("register.html")
 
 
-@app.route("/program_dashboard", methods=["POST", "GET"])
+
+
+
+@app.route("/program_dashboard", methods=["GET"])
 def program_dashboard():
-    return render_template("program_dashboard.html")
+    db = Database()
+    workout_programs = db.retrieve_all_workout_programs()
+
+    return render_template("program_dashboard.html", workout_programs=workout_programs, user_id=session.get("user_id"))
+
+
+
+
+
+@app.route("/program", methods=["POST", "GET"])
+def create_program():
+
+    if request.method == "POST":
+        pass
+
+    return render_template("program.html")
+
+
+
+
+
+
+
+
+
+
+
+@app.route("/program/<program_id>", methods=["POST", "GET"])
+def program(program_id):
+
+    if request.method == "POST":
+        pass
+
+    db = Database()
+    program = db.retrieve_workout_program_by_id(program_id)
+
+
+    return render_template("program.html", program=program)
 
 #------------------------------------------------------------------
 
