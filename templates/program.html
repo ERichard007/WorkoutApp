@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <title>Document</title>
 </head>
 <body>
@@ -11,6 +12,7 @@
         {% set program_desc = program.description %}
         {% set is_active = program.currently_active %}
         {% set creation_time = program.created_at %}
+        {% set program_user_id = program.user_id %}
     {% else %}
         {% set program_name = "Enter Name for Program" %}
         {% set program_desc = "(Optional description)" %}
@@ -20,24 +22,42 @@
 
     <p>{{ error if error }}</p>
 
-    <form method="post">
-        <div>
-            <h1>
-                <input type="text" name="program_name" placeholder="{{ program_name }}" required><br>  
-            </h1>
+    {% if user_id == program_user_id %}
+        
+        <form method="post">
+            <div>
+                <h1>
+                    <input type="text" name="program_name" placeholder="Enter Program Name" value="{{ program_name }}" required><br>  
+                </h1>
 
-            <label for="status">Active:</label>
-            <input type="radio" name="status" {% if is_active %}checked{% endif %}><br>
+                <label for="status">Active:</label>
+                <input type="radio" name="status" {% if is_active %}checked{% endif %}><br>
+
+                <p>
+                    <textarea name="program_desc" placeholder="Description..."> {{ program_desc }}</textarea><br>
+                </p>
+            </div>
+
+            <button type="submit">Submit</button>
+        </form>
+
+        <button onclick="window.location.href='/program_dashboard'">Back to Program Dashboard</button>
+
+    {% else %}
+        
+        <div>
+            <h1>{{ program_name }}</h1><br>
+
+            <input type="radio" name="status" {% if is_active %}checked{% endif %} disabled><br>
 
             <p>
-                <textarea name="program_desc" placeholder="{{ program_desc }}"></textarea><br>
+                <textarea name="program_desc" disabled>{{ program_desc }}</textarea><br>
             </p>
         </div>
 
-        <button type="submit">Submit</button>
-    </form>
+    {% endif %}
 
-    <button onclick="window.location.href='/program_dashboard'">Back to Program Dashboard</button>
+    
 
     
 </body>

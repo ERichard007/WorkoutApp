@@ -101,6 +101,8 @@ class Database:
             '''
         }
     
+    # Database management methods
+
     def drop_tables(self) -> None:
         """
         drops all tables in the database if they exist.
@@ -134,7 +136,9 @@ class Database:
                 print(f"Error creating table {t}: {e}")
         
         self._conn.commit()
-
+    
+    # User management methods
+    
     def get_user(self, username : str, password : str) -> User:
         """
         Retrieves a user from the database based on the provided username and password.
@@ -211,6 +215,8 @@ class Database:
 
         return new_user
     
+    # Workout program management methods
+    
     def retrieve_all_workout_programs(self) -> list[Workout_Program]:
         """
         Will retrieve all workout programs in the database and return them as a list of Workout_Program objects
@@ -277,4 +283,38 @@ class Database:
 
         return new_workout_program
 
+    def update_workout_program(self, program_id : int, name : str = None, description : str = None, currently_active : bool = None) -> Workout_Program:
+        """
+        Updates an existing workout program in the database with the provided information.
+
+        Args:
+            program_id (int): The unique identifier of the workout program to update.
+            name (str, optional): The new name for the workout program. Defaults to None, which will not update the name.
+            description (str, optional): The new description for the workout program. Defaults to None, which will not update the description.
+            currently_active (bool, optional): The new active status for the workout program. Defaults to None, which will not update the active status.
+
+        Raises:
+            Exception: If there is an error retrieving the existing workout program from the database.
+
+        Returns:
+            Workout_Program: A Workout_Program object representing the updated workout program if the operation is successful, or None if no workout program with the provided ID exists.
+        """
+
+        try:
+            existing_program = self.retrieve_workout_program_by_id(program_id)
+        except Exception as e:
+            print(f"Error occurred while retrieving workout program: {e}")
+            return None
+
+        updated_name = name if name is not None else existing_program.name
+        updated_description = description if description is not None else existing_program.description
+        updated_currently_active = currently_active if currently_active is not None else existing_program.currently_active
+
+        self._cur.execute(
+            "UPDATE workout_programs SET name = ?, description = ?, currently_active = ? WHERE id = ?", 
+            (updated_name, updated_description, updated_currently_active, program_id)
+        )
+        self._conn.commit()
+
+        return existing_program
 #------------------------------------------------------------------------------------

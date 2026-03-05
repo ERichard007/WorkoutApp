@@ -5,9 +5,7 @@ from exceptions import UserDoesntExistException, UserExistsException
 #------------------------------------------------------------------
 
 # Other imports
-from flask import Flask, render_template, session, redirect, request, url_for
-import os
-
+from flask import Flask, render_template, session, redirect, request
 
 #------------------------------------------------------------------
 
@@ -26,11 +24,6 @@ def home():
         return redirect("/program_dashboard")
     
     return redirect("/login")
-
-
-
-
-
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
@@ -54,10 +47,6 @@ def login():
 
     return render_template("login.html")
 
-
-
-
-
 @app.route("/register", methods=["POST", "GET"])
 def register():
     if request.method == "POST":
@@ -80,27 +69,12 @@ def register():
 
     return render_template("register.html")
 
-
-
-
-
-
-
 @app.route("/program_dashboard", methods=["GET"])
 def program_dashboard():
     db = Database()
     workout_programs = db.retrieve_all_workout_programs()
 
     return render_template("program_dashboard.html", workout_programs=workout_programs, user_id=session.get("user_id"))
-
-
-
-
-
-
-
-
-
 
 @app.route("/program", methods=["POST", "GET"])
 def create_program():
@@ -123,33 +97,28 @@ def create_program():
 
     return render_template("program.html")
 
-
-
-
-
-
-
-
-
-
-
 @app.route("/program/<program_id>", methods=["POST", "GET"])
 def program(program_id):
 
     if request.method == "POST":
-        pass
+        db = Database()
+
+        updated_program = db.update_workout_program(
+            program_id=program_id,
+            name=request.form["program_name"],
+            description=request.form["program_desc"],
+            currently_active=request.form["status"]
+        )
+
+        return render_template("program.html", program=updated_program, user_id=session.get("user_id"))
 
     db = Database()
     program = db.retrieve_workout_program_by_id(program_id)
 
 
-    return render_template("program.html", program=program)
-
-
-
+    return render_template("program.html", program=program, user_id=session.get("user_id"))
 
 #APIS ----------------------------------------------------------------------------------------------------------------
-
 
 @app.route("/api/logout", methods=["GET"])
 def logout():

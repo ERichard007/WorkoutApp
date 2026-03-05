@@ -38,5 +38,5 @@ Returns:
 
 # TO-DO
 
-1. Program Dashboard (list excercises)
-2. Program (list actual program, add excercises, delete them and all sorts of stuff)
+Work on actual design layout of what you wanna do so programming is easier:
+This means mostly UI/UX design, learn what the professionals use for such a thing as CSS/JS is annoying there must be somehting to help with that like flask does for backend
